@@ -50,7 +50,8 @@ def login():
     user = User.query.filter_by(email=data['email']).first()
     
     if user and bcrypt.checkpw(data['password'].encode('utf-8'), user.password_hash.encode('utf-8')):
-        access_token = create_access_token(identity=user.id)
+        # identity must be a string in newer flask-jwt-extended versions
+        access_token = create_access_token(identity=str(user.id))
         return jsonify(access_token=access_token, user={"username": user.username, "email": user.email}), 200
     
     return jsonify({"msg": "Bad email or password"}), 401
@@ -65,8 +66,7 @@ def upload_data():
     file = request.files['file']
     if file.filename == '':
         return jsonify({"msg": "No selected file"}), 400
-    
-    current_user_id = get_jwt_identity()
+    current_user_id = int(get_jwt_identity())
     
     try:
         if file.filename.endswith('.csv'):
@@ -102,7 +102,7 @@ def upload_data():
 @app.route('/api/dashboard', methods=['GET'])
 @jwt_required()
 def get_dashboard_data():
-    current_user_id = get_jwt_identity()
+    current_user_id = int(get_jwt_identity())
     records = SalesRecord.query.filter_by(user_id=current_user_id).all()
     
     if not records:
