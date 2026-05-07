@@ -8,8 +8,8 @@ services:
     startCommand: cd backend && gunicorn app:app
     envVars:
       - key: DATABASE_URL
-        value: sqlite:///sales.db # Change this if using a managed database
+        value: sqlite:///sales.db
       - key: JWT_SECRET_KEY
-        fromContext: secret
+        generateValue: true
       - key: NODE_VERSION
         value: 18.0.0
