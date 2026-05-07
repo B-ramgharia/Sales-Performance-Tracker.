@@ -11,7 +11,12 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-app = Flask(__name__, static_folder='../frontend/dist', static_url_path='/')
+# Determine the base directory
+base_dir = os.path.abspath(os.path.dirname(__file__))
+# Frontend dist folder is one level up from backend/app.py
+frontend_dist = os.path.join(base_dir, '..', 'frontend', 'dist')
+
+app = Flask(__name__, static_folder=frontend_dist, static_url_path='')
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', 'sqlite:///sales.db')
 if app.config['SQLALCHEMY_DATABASE_URI'] and app.config['SQLALCHEMY_DATABASE_URI'].startswith("postgres://"):
     app.config['SQLALCHEMY_DATABASE_URI'] = app.config['SQLALCHEMY_DATABASE_URI'].replace("postgres://", "postgresql://", 1)
@@ -141,7 +146,7 @@ def get_dashboard_data():
 @app.route('/', defaults={'path': ''})
 @app.route('/<path:path>')
 def serve(path):
-    if path != "" and os.path.exists(app.static_folder + '/' + path):
+    if path != "" and os.path.exists(os.path.join(app.static_folder, path)):
         return send_from_directory(app.static_folder, path)
     else:
         return send_from_directory(app.static_folder, 'index.html')
