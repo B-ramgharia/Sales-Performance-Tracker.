@@ -52,6 +52,12 @@ const Dashboard = () => {
     </div>
   );
 
+  if (!data) return (
+    <div className="p-8 text-center text-gray-500">
+      Failed to load dashboard data. Please try refreshing or uploading a new file.
+    </div>
+  );
+
   const { kpis, charts, recent_sales } = data || { kpis: {}, charts: {}, recent_sales: [] };
 
   const lineData = {
